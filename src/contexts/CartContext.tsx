@@ -11,12 +11,22 @@ export interface CartItem {
   category: string;
 }
 
+export interface OrderHistoryItem {
+  id: string;
+  items: CartItem[];
+  total: number;
+  date: string;
+  status: string;
+}
+
 interface CartContextType {
   items: CartItem[];
+  orderHistory: OrderHistoryItem[];
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
   removeItem: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
+  completeOrder: (orderDetails: Omit<OrderHistoryItem, 'id'>) => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
 }
@@ -33,6 +43,7 @@ export const useCart = () => {
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [orderHistory, setOrderHistory] = useState<OrderHistoryItem[]>([]);
 
   const addItem = (newItem: Omit<CartItem, 'quantity'>) => {
     setItems(prev => {
@@ -68,6 +79,15 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setItems([]);
   };
 
+  const completeOrder = (orderDetails: Omit<OrderHistoryItem, 'id'>) => {
+    const newOrder: OrderHistoryItem = {
+      ...orderDetails,
+      id: `WM${Date.now().toString().slice(-8)}`,
+    };
+    setOrderHistory(prev => [newOrder, ...prev]);
+    clearCart();
+  };
+
   const getTotalItems = () => {
     return items.reduce((total, item) => total + item.quantity, 0);
   };
@@ -82,10 +102,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   return (
     <CartContext.Provider value={{
       items,
+      orderHistory,
       addItem,
       removeItem,
       updateQuantity,
       clearCart,
+      completeOrder,
       getTotalItems,
       getTotalPrice
     }}>
