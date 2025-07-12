@@ -4,58 +4,75 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Star, MapPin } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
+import { useToast } from "@/hooks/use-toast";
 
 interface TrendingSuggestionsProps {
   location: {
     city: string;
     country: string;
   };
-  onAddToCart: (productName: string) => void;
+  onAddToCart: (productName: string, productData: any) => void;
 }
 
 const TrendingSuggestions: React.FC<TrendingSuggestionsProps> = ({ location, onAddToCart }) => {
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
   const getTrendingProducts = () => {
     return [
       {
-        id: 1,
+        id: 10,
         name: "Mocha Cold Brew",
         price: "₹199",
         image: "☕",
         description: "Viral coffee trend hitting Mumbai",
         badge: "🔥 Trending",
-        trendScore: 95
+        trendScore: 95,
+        category: "Food & Beverages"
       },
       {
-        id: 2,
+        id: 11,
         name: "Festive Decorations",
         price: "₹1,499",
         image: "🎉",
         description: "Perfect for upcoming festivals",
         badge: "🎊 Festival",
-        trendScore: 87
+        trendScore: 87,
+        category: "Home Decor"
       },
       {
-        id: 3,
+        id: 12,
         name: "Ethnic Wear",
         price: "₹2,999",
         image: "👗",
         description: "Traditional outfits in high demand",
         badge: "👑 Premium",
-        trendScore: 92
+        trendScore: 92,
+        category: "Clothing"
       },
       {
-        id: 4,
+        id: 13,
         name: "Smart Fitness Band",
         price: "₹3,499",
         image: "⌚",
         description: "Health tracking made simple",
         badge: "💪 Wellness",
-        trendScore: 78
+        trendScore: 78,
+        category: "Electronics"
       }
     ];
   };
 
   const products = getTrendingProducts();
+
+  const handleAddToCart = (product: any) => {
+    addItem(product);
+    toast({
+      title: "Added to Cart!",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -86,7 +103,7 @@ const TrendingSuggestions: React.FC<TrendingSuggestionsProps> = ({ location, onA
               <div className="flex items-center justify-between">
                 <span className="text-2xl font-bold text-green-600">{product.price}</span>
                 <Button 
-                  onClick={() => onAddToCart(product.name)}
+                  onClick={() => handleAddToCart(product)}
                   className="bg-green-600 hover:bg-green-700"
                 >
                   Add to Cart

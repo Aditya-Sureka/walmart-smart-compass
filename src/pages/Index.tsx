@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { MapPin, Cloud, TrendingUp, Accessibility, ShoppingCart, Bell } from 'lucide-react';
+import { MapPin, Cloud, TrendingUp, Accessibility, ShoppingCart, Bell, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,23 +11,22 @@ import WeatherSuggestions from '@/components/WeatherSuggestions';
 import TrendingSuggestions from '@/components/TrendingSuggestions';
 import AccessibilityPanel from '@/components/AccessibilityPanel';
 import NotificationCenter from '@/components/NotificationCenter';
+import { useCart } from '@/contexts/CartContext';
 
 const Index = () => {
+  const { getTotalItems } = useCart();
   const [location, setLocation] = useState({ city: 'Mumbai', country: 'India' });
   const [weather, setWeather] = useState({ condition: 'Rainy', temp: 28, icon: '🌧️' });
   const [accessibleMode, setAccessibleMode] = useState(false);
-  const [cartItems, setCartItems] = useState(0);
   const [notifications, setNotifications] = useState([
     "Mocha Cold Brew is trending in your area! ☕",
     "Rain expected today - check our umbrella collection 🌂",
     "Festival season deals are live! 🎉"
   ]);
 
-  const addToCart = (productName: string) => {
-    setCartItems(prev => prev + 1);
-    // Add a success notification
-    const newNotification = `${productName} added to cart!`;
-    setNotifications(prev => [newNotification, ...prev.slice(0, 4)]);
+  const addToCart = (productName: string, productData: any) => {
+    // This function is passed to child components to handle adding items
+    console.log(`Adding ${productName} to cart`, productData);
   };
 
   return (
@@ -59,15 +59,24 @@ const Index = () => {
               {/* Notifications */}
               <NotificationCenter notifications={notifications} />
               
+              {/* Profile */}
+              <Link to="/profile">
+                <Button variant="outline" size="icon">
+                  <User className="h-4 w-4" />
+                </Button>
+              </Link>
+              
               {/* Cart */}
-              <Button variant="outline" className="relative">
-                <ShoppingCart className="h-4 w-4" />
-                {cartItems > 0 && (
-                  <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                    {cartItems}
-                  </Badge>
-                )}
-              </Button>
+              <Link to="/cart">
+                <Button variant="outline" className="relative">
+                  <ShoppingCart className="h-4 w-4" />
+                  {getTotalItems() > 0 && (
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                      {getTotalItems()}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -112,6 +121,40 @@ const Index = () => {
             Discover products tailored to your location, weather, and trending preferences. 
             We make shopping smarter and more inclusive for everyone.
           </p>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+          <Link to="/orders">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">📦</div>
+                <span className="font-medium">My Orders</span>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/cart">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">🛒</div>
+                <span className="font-medium">Cart ({getTotalItems()})</span>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/profile">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl mb-2">👤</div>
+                <span className="font-medium">Profile</span>
+              </CardContent>
+            </Card>
+          </Link>
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl mb-2">💳</div>
+              <span className="font-medium">Offers</span>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Suggestions Grid */}

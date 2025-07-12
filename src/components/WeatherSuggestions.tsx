@@ -3,7 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Umbrella, Thermometer, Snowflake, Sun } from 'lucide-react';
+import { Thermometer } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
+import { useToast } from "@/hooks/use-toast";
 
 interface WeatherSuggestionsProps {
   weather: {
@@ -11,10 +13,13 @@ interface WeatherSuggestionsProps {
     temp: number;
     icon: string;
   };
-  onAddToCart: (productName: string) => void;
+  onAddToCart: (productName: string, productData: any) => void;
 }
 
 const WeatherSuggestions: React.FC<WeatherSuggestionsProps> = ({ weather, onAddToCart }) => {
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
   const getWeatherProducts = () => {
     const { condition, temp } = weather;
     
@@ -26,7 +31,8 @@ const WeatherSuggestions: React.FC<WeatherSuggestionsProps> = ({ weather, onAddT
           price: "₹899",
           image: "🌂",
           description: "Stay dry with our wind-resistant umbrella",
-          badge: "Weather Essential"
+          badge: "Weather Essential",
+          category: "Weather Protection"
         },
         {
           id: 2,
@@ -34,7 +40,8 @@ const WeatherSuggestions: React.FC<WeatherSuggestionsProps> = ({ weather, onAddT
           price: "₹2,499",
           image: "🧥",
           description: "Lightweight, breathable rain protection",
-          badge: "Trending"
+          badge: "Trending",
+          category: "Clothing"
         },
         {
           id: 3,
@@ -42,67 +49,82 @@ const WeatherSuggestions: React.FC<WeatherSuggestionsProps> = ({ weather, onAddT
           price: "₹1,299",
           image: "👢",
           description: "Comfortable waterproof footwear",
-          badge: "Best Seller"
+          badge: "Best Seller",
+          category: "Footwear"
         }
       ];
     } else if (temp > 30) {
       return [
         {
-          id: 1,
+          id: 4,
           name: "Portable AC",
           price: "₹25,999",
           image: "❄️",
           description: "Energy-efficient cooling solution",
-          badge: "Summer Essential"
+          badge: "Summer Essential",
+          category: "Electronics"
         },
         {
-          id: 2,
+          id: 5,
           name: "Cotton T-Shirts",
           price: "₹699",
           image: "👕",
           description: "Breathable, comfortable summer wear",
-          badge: "Comfort"
+          badge: "Comfort",
+          category: "Clothing"
         },
         {
-          id: 3,
+          id: 6,
           name: "Water Bottle",
           price: "₹399",
           image: "💧",
           description: "Insulated steel water bottle",
-          badge: "Hydration"
+          badge: "Hydration",
+          category: "Health"
         }
       ];
     } else {
       return [
         {
-          id: 1,
+          id: 7,
           name: "Warm Blanket",
           price: "₹1,899",
           image: "🛏️",
           description: "Cozy fleece blanket for comfort",
-          badge: "Comfort"
+          badge: "Comfort",
+          category: "Home"
         },
         {
-          id: 2,
+          id: 8,
           name: "Hot Beverages",
           price: "₹299",
           image: "☕",
           description: "Premium tea and coffee collection",
-          badge: "Warming"
+          badge: "Warming",
+          category: "Food & Beverages"
         },
         {
-          id: 3,
+          id: 9,
           name: "Sweater",
           price: "₹1,599",
           image: "🧶",
           description: "Soft wool blend sweater",
-          badge: "Cozy"
+          badge: "Cozy",
+          category: "Clothing"
         }
       ];
     }
   };
 
   const products = getWeatherProducts();
+
+  const handleAddToCart = (product: any) => {
+    addItem(product);
+    toast({
+      title: "Added to Cart!",
+      description: `${product.name} has been added to your cart.`,
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -127,7 +149,7 @@ const WeatherSuggestions: React.FC<WeatherSuggestionsProps> = ({ weather, onAddT
               <div className="flex items-center justify-between">
                 <span className="text-2xl font-bold text-blue-600">{product.price}</span>
                 <Button 
-                  onClick={() => onAddToCart(product.name)}
+                  onClick={() => handleAddToCart(product)}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
                   Add to Cart
